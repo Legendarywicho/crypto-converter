@@ -1,6 +1,7 @@
 package com.luis_santiago.cryptoconverter.tools;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -15,6 +16,8 @@ import com.luis_santiago.cryptoconverter.ConverterActivity;
 import com.luis_santiago.cryptoconverter.Model.Crypto;
 import com.luis_santiago.cryptoconverter.R;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 /**
@@ -24,9 +27,11 @@ import java.util.ArrayList;
 public class CryptoCoinAdapter extends RecyclerView.Adapter<CryptoCoinAdapter.ViewHolder>{
 
     private ArrayList<Crypto> mListOfCriptos = new ArrayList<>();
+    private Context mContext;
 
-    public CryptoCoinAdapter(ArrayList <Crypto> anotherListOfCriptos){
+    public CryptoCoinAdapter(ArrayList <Crypto> anotherListOfCriptos , Context context){
         this.mListOfCriptos = anotherListOfCriptos;
+        this.mContext = context;
     }
 
     @Override
@@ -39,10 +44,25 @@ public class CryptoCoinAdapter extends RecyclerView.Adapter<CryptoCoinAdapter.Vi
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Crypto criptoCurrency = mListOfCriptos.get(position);
-        String value = criptoCurrency.getUnit() + " = "+criptoCurrency.getValue();
+        String localCurrency = Keys.getPreferenceCurrency(mContext);
+        double value = 0.0;
+        switch (localCurrency){
+            case "MXN":{
+                value = criptoCurrency.getValue();
+                break;
+            }
+            case "US" :{
+                value = criptoCurrency.getValue() / 20 ;
+                break;
+            }
+        }
+
+        NumberFormat formatter = new DecimalFormat("#0.00");
+
+        String valueFormatted = "1 "+criptoCurrency.getUnit() + " = "+ formatter.format(value) + " "+ localCurrency;
         holder.imageCrypto.setImageResource(criptoCurrency.getDrawable());
         holder.nameCrypto.setText(criptoCurrency.getName());
-        holder.valueOfCrypto.setText(value + " MX");
+        holder.valueOfCrypto.setText(valueFormatted);
         holder.container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -1,5 +1,11 @@
 <resources>
-    <string name="app_name">CryptoConverter</string>
+    <string name="app_name">CryptoVert</string>
     <string name="bitcoin_name">Bitcoin</string>
     <string name="bitcoin_value">1 BTC = $273,101.00</string>
+
+
+    <array name="options_local">
+        <item>MXN</item>
+        <item>US</item>
+    </array>
 </resources>
