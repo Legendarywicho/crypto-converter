@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context="com.luis_santiago.cryptoconverter.ConverterActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_margin="10dp"
+            android:layout_height="match_parent">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/input_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:inputType="number"
+                    android:hint="Cantidad"
+                    />
+            </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:text="De"
+                android:layout_margin="10dp"
+                android:textSize="20sp"
+                android:layout_height="wrap_content"/>
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/origin_converter"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:text="A"
+                android:textSize="20sp"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"/>
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/result_converter"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"/>
+
+            <TextView
+                android:id="@+id/result_textview"
+                android:layout_width="match_parent"
+                android:layout_margin="20dp"
+                android:layout_marginTop="20dp"
+                android:textSize="30sp"
+                android:gravity="center_horizontal"
+                android:text=""
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

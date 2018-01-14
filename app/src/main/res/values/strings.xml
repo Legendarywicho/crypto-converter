@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CryptoConverter</string>
+    <string name="bitcoin_name">Bitcoin</string>
+    <string name="bitcoin_value">1 BTC = $273,101.00</string>
+</resources>
