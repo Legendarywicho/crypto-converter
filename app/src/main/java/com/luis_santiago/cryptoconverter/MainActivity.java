@@ -1,5 +1,6 @@
 package com.luis_santiago.cryptoconverter;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func2;
+import rx.functions.Func4;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,26 +38,34 @@ public class MainActivity extends AppCompatActivity {
 
     private Subscription mSubscription;
 
+    private RecyclerView mRecycleview;
+
     private AdView mAdView;
+
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        RecyclerView mRecycleview = findViewById(R.id.recycle_view);
+        mRecycleview = findViewById(R.id.recycle_view);
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(this, 2);
         mRecycleview.setLayoutManager(mGridLayoutManager);
-        ArrayList<Crypto> cryptoArrayList = new ArrayList<>();
-        cryptoArrayList.add(new Crypto("Bitcoin" , 291996.85 , R.drawable.bitcoin_test_image , "BTC"));
-        cryptoArrayList.add(new Crypto("Etherium" , 291996.85 , R.drawable.ethereum , "ETH"));
-        cryptoArrayList.add(new Crypto("Ripple" , 291996.85 , R.drawable.litecoin, "XRP"));
-        cryptoArrayList.add(new Crypto("Litcoin" , 291996.85 , R.drawable.ripple, "LTC"));
-        cryptoCoinAdapter = new CryptoCoinAdapter(cryptoArrayList , MainActivity.this);
-        mRecycleview.setAdapter(cryptoCoinAdapter);
         setUpAd();
         setUpRequest();
+        displayDialogue();
     }
 
+    private void generateData(Double bitCoin , Double etherium , Double ripple , Double litcoin){
+        Log.e(TAG , "IM RECIVING RIPPLE VALUE " + ripple);
+        ArrayList<Crypto> cryptoArrayList = new ArrayList<>();
+        cryptoArrayList.add(new Crypto("Bitcoin" , bitCoin , R.drawable.bitcoin_test_image , "BTC"));
+        cryptoArrayList.add(new Crypto("Etherium" , etherium , R.drawable.ethereum , "ETH"));
+        cryptoArrayList.add(new Crypto("Ripple" , ripple , R.drawable.ripple, "XRP"));
+        cryptoArrayList.add(new Crypto("Litcoin" , litcoin , R.drawable.litecoin, "LTC"));
+        cryptoCoinAdapter = new CryptoCoinAdapter(cryptoArrayList , MainActivity.this);
+        mRecycleview.setAdapter(cryptoCoinAdapter);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
@@ -77,7 +87,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        cryptoCoinAdapter.notifyDataSetChanged();
+        if(cryptoCoinAdapter !=null){
+            cryptoCoinAdapter.notifyDataSetChanged();
+        }
         if (mAdView != null) {
             mAdView.resume();
         }
@@ -100,25 +112,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpRequest(){
-        Observable<Response> responseOneObservable = ApiClient.getApiClient().getLatestPrices()
+        Observable<Response> responseOneObservable = ApiClient.getApiClient().getLatestPricesBitCoin()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        Observable<Response> responseTwoObservable = ApiClient.getApiClient().getLatestPrices()
+        Observable<Response> responseOneObservable2 = ApiClient.getApiClient().getLatestPricesEtherium()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        Observable<Response> responseTwoObservable3 = ApiClient.getApiClient().getLatestPricesRipple()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        Observable<Response> responseTwoObservable4 = ApiClient.getApiClient().getLatestPricesLitecoin()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 
 
-        Observable.zip(responseOneObservable, responseTwoObservable, new Func2<Response, Response, Response>() {
+        Observable.zip(responseOneObservable, responseOneObservable2,responseTwoObservable3 ,responseTwoObservable4 , new Func4<Response, Response, Response, Response, Object>() {
             @Override
-            public Response call(Response response, Response response2) {
-                Log.e(TAG , "I GOT THE DATA FROM TWO RESPONDS" + response.getPayload().toString());
-                return response;
+            public Object call(Response bitcoin, Response eth, Response ripple, Response litecoin) {
+
+                generateData(
+                        Double.valueOf(bitcoin.getPayload().getHigh()),
+                        Double.valueOf(eth.getPayload().getHigh()),
+                        Double.valueOf(ripple.getPayload().getHigh()),
+                        Double.valueOf(litecoin.getPayload().getHigh())
+                );
+
+                dialog.dismiss();
+                return null;
             }
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response>() {
+                .subscribe(new Subscriber<Object>() {
                     @Override
                     public void onCompleted() {
 
@@ -126,13 +154,19 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                            Log.e(TAG , " ERRORR" + e.getMessage());
+                        //We load the local data
+                        dialog.dismiss();
+                        generateData(3000499.97 , 27533.36 , 38.00 , 5120.22);
                     }
 
                     @Override
-                    public void onNext(Response response) {
-
+                    public void onNext(Object o) {
                     }
                 });
+    }
+
+    public void displayDialogue(){
+        dialog = ProgressDialog.show(MainActivity.this, "Loading",
+                "Loading latest values", true);
     }
 }

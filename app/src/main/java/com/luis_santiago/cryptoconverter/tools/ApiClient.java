@@ -1,9 +1,6 @@
 package com.luis_santiago.cryptoconverter.tools;
 
-import android.database.Observable;
-
 import com.google.gson.Gson;
-import com.luis_santiago.cryptoconverter.Model.Payload;
 import com.luis_santiago.cryptoconverter.Model.Response;
 
 import retrofit2.Retrofit;
@@ -39,7 +36,19 @@ public class ApiClient {
         return mApiClient;
     }
 
-    public rx.Observable<Response> getLatestPrices(){
-        return mRequest.getLatestValues();
+    public rx.Observable<Response> getLatestPricesBitCoin(){
+        return mRequest.getLatestValuesBitcoin();
+    }
+
+    public rx.Observable<Response> getLatestPricesEtherium(){
+        return mRequest.getLatestValuesEtherium();
+    }
+
+    public rx.Observable<Response> getLatestPricesRipple(){
+        return mRequest.getLatestValuesRipple();
+    }
+
+    public rx.Observable<Response> getLatestPricesLitecoin(){
+        return mRequest.getLatestValuesLitecoin();
     }
 }

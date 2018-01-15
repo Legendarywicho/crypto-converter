@@ -13,6 +13,14 @@ import retrofit2.http.GET;
 public interface ApiInterface {
 
     @GET("?book=btc_mxn")
-    rx.Observable<Response> getLatestValues();
+    rx.Observable<Response> getLatestValuesBitcoin();
 
+    @GET("?book=eth_mxn")
+    rx.Observable<Response> getLatestValuesEtherium();
+
+    @GET("?book=xrp_mxn")
+    rx.Observable<Response> getLatestValuesRipple();
+
+    @GET("?book=ltc_mxn")
+    rx.Observable<Response> getLatestValuesLitecoin();
 }
