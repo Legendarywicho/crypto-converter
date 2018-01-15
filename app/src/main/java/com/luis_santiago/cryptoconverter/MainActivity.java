@@ -14,15 +14,25 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.luis_santiago.cryptoconverter.Model.Crypto;
+import com.luis_santiago.cryptoconverter.Model.Payload;
+import com.luis_santiago.cryptoconverter.Model.Response;
+import com.luis_santiago.cryptoconverter.tools.ApiClient;
 import com.luis_santiago.cryptoconverter.tools.CryptoCoinAdapter;
 
 import java.util.*;
+
+import rx.*;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private CryptoCoinAdapter cryptoCoinAdapter;
+
+    private Subscription mSubscription;
 
     private AdView mAdView;
 
@@ -41,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         cryptoCoinAdapter = new CryptoCoinAdapter(cryptoArrayList , MainActivity.this);
         mRecycleview.setAdapter(cryptoCoinAdapter);
         setUpAd();
+        setUpRequest();
     }
 
     @Override
@@ -64,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        Log.e(TAG , "im in resume");
         cryptoCoinAdapter.notifyDataSetChanged();
         if (mAdView != null) {
             mAdView.resume();
@@ -85,5 +95,28 @@ public class MainActivity extends AppCompatActivity {
             mAdView.destroy();
         }
         super.onDestroy();
+    }
+
+    private void setUpRequest(){
+        mSubscription = ApiClient.getApiClient()
+                .getLatestPrices()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Response>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG , "ERRRROORR " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Response response) {
+                        Log.e(TAG , "I GOT DATA " + response.getPayload().toString());
+                    }
+                });
     }
 }

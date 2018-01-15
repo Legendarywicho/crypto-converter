@@ -39,6 +39,7 @@ public class ConverterActivity extends AppCompatActivity implements TextWatcher 
 
     private double unitValue = 0.0;
 
+    private String localCurrency = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,14 +52,15 @@ public class ConverterActivity extends AppCompatActivity implements TextWatcher 
         }catch (Exception e){
             e.printStackTrace();
         }
-
+        localCurrency = Keys.getPreferenceCurrency(ConverterActivity.this);
         loadSpinnerData();
     }
 
     private void loadSpinnerData(){
+
         options = new ArrayList<>();
         options.add(mainUnit);
-        options.add("MX");
+        options.add(localCurrency);
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this , android.R.layout.simple_spinner_item , options);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         originSpinner.setAdapter(dataAdapter);
@@ -113,13 +115,15 @@ public class ConverterActivity extends AppCompatActivity implements TextWatcher 
     }
 
     private void calculateUnitToLocal(){
+        //TODO: CHECK IF IS DOLAR O MXN
         double currentNumber = getParseResultFromUser();
         double conversion = unitValue * currentNumber;
-        String format = "$#,###.00" + "MXN";
+        String format = "$#,###.00" + localCurrency;
         mResultView.setText(createFormatToShow(format , conversion));
     }
 
     private void calculateLocalToUnit(){
+        //TODO: CHECK IF IS DOLAR O MXN
         double currentNumber = getParseResultFromUser();
         double conversion = currentNumber/unitValue;
         String format = "#,###.00 " + mainUnit;
