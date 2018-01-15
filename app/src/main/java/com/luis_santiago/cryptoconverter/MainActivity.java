@@ -22,8 +22,10 @@ import com.luis_santiago.cryptoconverter.tools.CryptoCoinAdapter;
 import java.util.*;
 
 import rx.*;
+import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,11 +100,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpRequest(){
-        mSubscription = ApiClient.getApiClient()
-                .getLatestPrices()
+        Observable<Response> responseOneObservable = ApiClient.getApiClient().getLatestPrices()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        Observable<Response> responseTwoObservable = ApiClient.getApiClient().getLatestPrices()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+
+        Observable.zip(responseOneObservable, responseTwoObservable, new Func2<Response, Response, Response>() {
+            @Override
+            public Response call(Response response, Response response2) {
+                Log.e(TAG , "I GOT THE DATA FROM TWO RESPONDS" + response.getPayload().toString());
+                return response;
+            }
+        })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Response>() {
+                .subscribe(new Subscriber<Response>() {
                     @Override
                     public void onCompleted() {
 
@@ -110,12 +126,12 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e(TAG , "ERRRROORR " + e.getMessage());
+                            Log.e(TAG , " ERRORR" + e.getMessage());
                     }
 
                     @Override
                     public void onNext(Response response) {
-                        Log.e(TAG , "I GOT DATA " + response.getPayload().toString());
+
                     }
                 });
     }

@@ -14,4 +14,5 @@ public interface ApiInterface {
 
     @GET("?book=btc_mxn")
     rx.Observable<Response> getLatestValues();
+
 }
